@@ -12,30 +12,30 @@ class CashiersaleController extends Controller
      */
     public function index()
     {
-        $rows = DB::table('TB_selling_products')
-        ->join('users','TB_selling_products.cashier_id','=','users.id')
-        ->join('TB_items','TB_selling_products.items_id','=','TB_items.id')
-        ->Join('TB_Products', 'TB_items.product_id', '=', 'TB_Products.id')
-        ->join('TB_categories','TB_Products.category','=','TB_categories.id')
+        $rows = DB::table('tb_selling_products')
+        ->leftJoin('users','tb_selling_products.cashier_id','=','users.id')
+        ->leftJoin('tb_items','tb_selling_products.items_id','=','tb_items.id')
+        ->leftJoin('tb_productnew', 'tb_items.product_id', '=', 'tb_productnew.id')
+        ->leftJoin('tb_categories','tb_productnew.category','=','tb_categories.id')
         ->select(
-            'TB_selling_products.id',
-            'TB_items.product_id',
-            'TB_items.total_qty',
-            'TB_items.total_amount',
-            'TB_items.payment_method',
+            'tb_selling_products.id',
+            'tb_items.product_id',
+            'tb_items.total_qty',
+            'tb_items.total_amount',
+            'tb_items.payment_method',
             'users.name',
             'users.email',
-            'TB_Products.product_namekhmer',
-            'TB_Products.product_nameenglish',
-            'TB_Products.price',
-            'TB_Products.stock',
-            'TB_Products.category',
-            'TB_Products.image',
-            'TB_Products.image_public_id',
-            'TB_categories.category_name',
-            'TB_categories.description as category_description',
-            'TB_selling_products.created_at',
-            'TB_selling_products.updated-at'
+            'tb_productnew.product_namekhmer',
+            'tb_productnew.product_nameenglish',
+            'tb_productnew.price',
+            'tb_productnew.stock',
+            'tb_productnew.category',
+            'tb_productnew.image',
+            'tb_productnew.image_public_id',
+            'tb_categories.category_name',
+            'tb_categories.description as category_description',
+            'tb_selling_products.created_at',
+            'tb_selling_products.updated_at'
         )->get();
                $result = $rows->map(function ($row) {
             return [
@@ -89,7 +89,7 @@ class CashiersaleController extends Controller
         // ]);
 
     foreach ($request->items_id as $itemId) {
-        DB::table('TB_selling_products')->insert([
+        DB::table('tb_selling_products')->insert([
             'cashier_id' => $request->cashier_id,
             'items_id'   => $itemId,        // ✅ ONE item per row
             'created_at' => now(),
@@ -106,31 +106,31 @@ class CashiersaleController extends Controller
      */
     public function show($id)
     {
-         $rows = DB::table('TB_selling_products')
-        ->join('users','TB_selling_products.cashier_id','=','users.id')
-        ->join('TB_items','TB_selling_products.items_id','=','TB_items.id')
-        ->Join('TB_Products', 'TB_items.product_id', '=', 'TB_Products.id')
-        ->join('TB_categories','TB_Products.category','=','TB_categories.id')
+         $rows = DB::table('tb_selling_products')
+       ->leftJoin('users','tb_selling_products.cashier_id','=','users.id')
+        ->leftJoin('tb_items','tb_selling_products.items_id','=','tb_items.id')
+        ->leftJoin('tb_productnew', 'tb_items.product_id', '=', 'tb_productnew.id')
+        ->leftJoin('tb_categories','tb_productnew.category','=','tb_categories.id')
         ->select(
-            'TB_selling_products.id',
-            'TB_items.product_id',
-            'TB_items.total_qty',
-            'TB_items.total_amount',
-            'TB_items.payment_method',
+            'tb_selling_products.id',
+            'tb_items.product_id',
+            'tb_items.total_qty',
+            'tb_items.total_amount',
+            'tb_items.payment_method',
             'users.name',
             'users.email',
-            'TB_Products.product_namekhmer',
-            'TB_Products.product_nameenglish',
-            'TB_Products.price',
-            'TB_Products.stock',
-            'TB_Products.category',
-            'TB_Products.image',
-            'TB_Products.image_public_id',
-            'TB_categories.category_name',
-            'TB_categories.description as category_description',
-            'TB_selling_products.created_at',
-            'TB_selling_products.updated-at'
-        )->where('TB_selling_products.id',$id)->get();
+            'tb_productnew.product_namekhmer',
+            'tb_productnew.product_nameenglish',
+            'tb_productnew.price',
+            'tb_productnew.stock',
+            'tb_productnew.category',
+            'tb_productnew.image',
+            'tb_productnew.image_public_id',
+            'tb_categories.category_name',
+            'tb_categories.description as category_description',
+            'tb_selling_products.created_at',
+            'tb_selling_products.updated_at'
+        )->where('tb_selling_products.id',$id)->get();
         $result = $rows->map(function ($row) {
             return [
                 'id' => $row->id,
@@ -171,7 +171,7 @@ class CashiersaleController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $update = DB::table('TB_selling_products')
+        $update = DB::table('tb_selling_products')
         ->where('id',$id)
         ->update([
             'cashier_id' => $request->cashier_id,
@@ -193,9 +193,9 @@ class CashiersaleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destory(string $id)
     {
-        DB::table('TB_selling_products')->where('id',$id)->delete();
+        DB::table('tb_selling_products')->where('id',$id)->delete();
         return response()-> json([
             'Message' =>  'Delete success'
         ]);

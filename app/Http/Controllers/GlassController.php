@@ -12,7 +12,7 @@ class GlassController extends Controller
      */
     public function index()
     {
-        $glasses = DB::table('TB_Glass')->get();
+        $glasses = DB::table('tb_glass')->get();
         return response()->json([
             'Message' => 'Get Glass sucess',
             'data'    =>  $glasses]);
@@ -28,7 +28,7 @@ class GlassController extends Controller
             'type' => 'required|string',
         ]);
         
-        $id = DB::table('TB_Glass')->insertGetId([
+        $id = DB::table('tb_glass')->insertGetId([
             'name' => $request->name,
             'type' => $request->type,
         ]);
@@ -55,7 +55,7 @@ class GlassController extends Controller
             'type' => 'sometimes|required|string',
         ]);
 
-        $updated = DB::table('TB_Glass')->where('id', $id)->update([
+        $updated = DB::table('tb_glass')->where('id', $id)->update([
             'name' => $request->name,
             'type' => $request->type,
         ]);
@@ -72,7 +72,7 @@ class GlassController extends Controller
      */
     public function destroy(string $id)
     {
-        $deleted = DB::table('TB_Glass')->where('id', $id)->delete();
+        $deleted = DB::table('tb_glass')->where('id', $id)->delete();
         if (!$deleted) {
             return response()->json(['error' => 'Glass not found'], 404);
         }

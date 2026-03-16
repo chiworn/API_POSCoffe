@@ -12,20 +12,23 @@ class GlassUseController extends Controller
      */
     public function index()
     {
-        $glassUses = DB::table('TB_ Glass_use')
-            ->join('TB_Products', 'TB_ Glass_use.product_id', '=', 'TB_Products.id')
-            ->join('TB_Glass', 'TB_ Glass_use.glass_id', '=', 'TB_Glass.id')
-            ->join('TB_stock', 'TB_ Glass_use.glass_id', '=', 'TB_stock.id')
-            ->select(
-                'TB_ Glass_use.id',
-                'TB_Products.product_nameenglish',
-                'TB_Glass.name as glass_name',
-                'TB_ Glass_use.quantity_used',
-                'TB_stock.quantity'
-            )
-            ->get();
+      $glassUses = DB::table('tb_glass_uses')
+                    ->join('tb_productnew', 'tb_glass_uses.product_id', '=', 'tb_productnew.id')
+                    ->join('tb_glass', 'tb_glass_uses.glass_id', '=', 'tb_glass.id')
+                    ->join('tb_stock', 'tb_stock.glass_id', '=', 'tb_glass.id')
+                    ->join('users', 'tb_glass_uses.cashier_id', '=', 'users.id')
+                    ->select(
+                        'tb_glass_uses.id',
+                        'tb_productnew.product_nameenglish',
+                        'tb_glass.name as glass_name',
+                        'tb_glass_uses.quantity_used',
+                        'tb_stock.quantity as stock_quantity',
+                        'users.name as cashier_name'
+                    )
+                    ->get();
 
-        return response()->json($glassUses);
+                return response()->json($glassUses);
+
     }
 
     /**
@@ -36,11 +39,13 @@ class GlassUseController extends Controller
          $request->validate([
             'product_id' => 'required|integer',
             'glass_id' => 'required|integer',
+            'cashier_id'  => 'required|integer',
             'quantity_used' => 'required|integer|min:1'
         ]);
-         $id = DB::table('TB_ Glass_use')->insertGetId([
+         $id = DB::table('tb_glass_uses')->insertGetId([
             'product_id' => $request->product_id,
             'glass_id' => $request->glass_id,
+            'cashier_id'   =>$request->cashier_id,
             'quantity_used' => $request->quantity_used
         ]);
 

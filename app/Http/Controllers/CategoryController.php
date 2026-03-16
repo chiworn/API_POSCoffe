@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
 {
-    protected $table = 'TB_categories'; // your table name
+    protected $table = 'tb_categories'; // your table name
 
     // 🔹 Get all categories
     public function index()
