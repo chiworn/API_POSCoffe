@@ -1,28 +1,26 @@
 FROM php:8.2-fpm
 
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    git curl libpng-dev libonig-dev \
-    libxml2-dev libpq-dev zip unzip nginx
+    git unzip libpq-dev curl zip libonig-dev libpng-dev libjpeg-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN docker-php-ext-install pdo pdo_pgsql pgsql mbstring exif pcntl bcmath gd
+# Install PHP extensions needed for Laravel + PostgreSQL + Cloudinary
+RUN docker-php-ext-install pdo pdo_pgsql mbstring bcmath tokenizer xml curl gd
 
+# Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-WORKDIR /var/www
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy project files
 COPY . .
 
-RUN composer install --no-dev --optimize-autoloader
+# Install Laravel dependencies
+RUN php -d memory_limit=-1 /usr/bin/composer install --no-dev --optimize-autoloader
 
-RUN mkdir -p storage/framework/sessions \
-    storage/framework/views \
-    storage/framework/cache \
-    storage/logs bootstrap/cache
+# Expose port 9000
+EXPOSE 9000
 
-RUN chown -R www-data:www-data /var/www
-RUN chmod -R 775 /var/www/storage /var/www/bootstrap/cache
-
-COPY nginx.conf /etc/nginx/sites-enabled/default
-EXPOSE 10000
-COPY start.sh /start.sh
-RUN chmod +x /start.sh
-CMD ["/start.sh"]
+CMD ["php-fpm"]
