@@ -12,20 +12,20 @@ class ItemsController extends Controller
      */
     public function index()
     {
-        $items = DB::table('TB_items')
-        ->Join('TB_Products', 'TB_items.product_id', '=', 'TB_Products.id')
-         ->join('TB_categories','TB_Products.category','=','TB_categories.id')
+        $items = DB::table('tb_items')
+        ->Join('tb_productnew', 'tb_items.product_id', '=', 'tb_productnew.id')
+         ->join('tb_categories','tb_productnew.category','=','tb_categories.id')
         ->select(
-            'TB_items.*',
-            'TB_Products.product_namekhmer',
-            'TB_Products.product_nameenglish',
-            'TB_Products.price',
-            'TB_Products.stock',
-            'TB_Products.category',
-            'TB_categories.category_name',
-            'TB_categories.description',
-            'TB_Products.image',
-            'TB_Products.image_public_id' 
+            'tb_items.*',
+            'tb_productnew.product_namekhmer',
+            'tb_productnew.product_nameenglish',
+            'tb_productnew.price',
+            'tb_productnew.stock',
+            'tb_productnew.category',
+            'tb_categories.category_name',
+            'tb_categories.description',
+            'tb_productnew.image',
+            'tb_productnew.image_public_id' 
              )->get();
         return response()->json([
             'Message' => 'Get Items successs',
@@ -45,7 +45,7 @@ class ItemsController extends Controller
             'payment_method' => 'required|string',
         ]);
 
-        $id =  DB::table('TB_items')->insertGetId([
+        $id =  DB::table('tb_items')->insertGetId([
             'product_id'     => $request->product_id,
             'total_qty'      => $request->total_qty,
             'total_amount'   => $request->total_amount,
@@ -64,21 +64,21 @@ class ItemsController extends Controller
      */
        public function show($id)
     {
-        $order = DB::table('TB_items')
-        ->Join('TB_Products', 'TB_items.product_id', '=', 'TB_Products.id')
-        ->join('TB_categories','TB_Products.category','=','TB_categories.id')
+        $order = DB::table('tb_items')
+        ->Join('tb_productnew', 'tb_items.product_id', '=', 'tb_productnew.id')
+        ->join('tb_categories','tb_productnew.category','=','tb_categories.id')
         ->select(
-            'TB_items.*',
-            'TB_Products.product_namekhmer',
-            'TB_Products.product_nameenglish',
-            'TB_Products.price',
-            'TB_Products.stock',
-            'TB_Products.category',
-            'TB_categories.category_name',
-            'TB_categories.description',
-            'TB_Products.image',
-            'TB_Products.image_public_id' 
-             )->where('TB_items.id', $id)->get();
+            'tb_items.*',
+            'tb_productnew.product_namekhmer',
+            'tb_productnew.product_nameenglish',
+            'tb_productnew.price',
+            'tb_productnew.stock',
+            'tb_productnew.category',
+            'tb_categories.category_name',
+            'tb_categories.description',
+            'tb_categories.image',
+            'tb_categories.image_public_id' 
+             )->where('tb_items.id', $id)->get();
 
         if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);
@@ -91,7 +91,7 @@ class ItemsController extends Controller
      */
     public function update(Request $request,$id)
     {
-        $updated = DB::table('TB_items')
+        $updated = DB::table('tb_items')
             ->where('id',$id)
             ->update([
                 'product_id'     => $request->product_id,
@@ -113,7 +113,7 @@ class ItemsController extends Controller
      */
      public function destroy($id)
     {
-        $deleted = DB::table('TB_items')->where('id', $id)->delete();
+        $deleted = DB::table('tb_items')->where('id', $id)->delete();
 
         if (!$deleted) {
             return response()->json(['message' => 'Order not found'], 404);

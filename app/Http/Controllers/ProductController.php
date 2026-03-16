@@ -12,12 +12,12 @@ class ProductController extends Controller
 
     public function index()
     {
-        $allproduct = DB::table('TB_Products')
-        ->join('TB_categories','TB_Products.category','=','TB_categories.id')
+        $allproduct = DB::table('tb_productnew')
+        ->join('tb_categories','tb_productnew.category','=','tb_categories.id')
         ->select(
-            'TB_Products.*',
-            'TB_categories.category_name',
-            'TB_categories.description'
+            'tb_productnew.*',
+            'tb_categories.category_name',
+            'tb_categories.description'
         )
         ->get();
         return response()->json([
@@ -54,7 +54,7 @@ class ProductController extends Controller
         $imageUrl = $upload['secure_url'];
         $publicId  = $upload['public_id'];
 
-        DB::table('TB_Products')->insert([
+        DB::table('tb_productnew')->insert([
             'product_namekhmer'     => $request->product_namekhmer,
             'product_nameenglish'   => $request->product_nameenglish,
             'price'                 => $request->price,
@@ -91,7 +91,7 @@ class ProductController extends Controller
     ]);
 
     // 1️⃣ Get old product
-    $product = DB::table('TB_Products')->where('id', $id)->first();
+    $product = DB::table('tb_productnew')->where('id', $id)->first();
 
     if (!$product) {
         return response()->json([
@@ -141,7 +141,7 @@ class ProductController extends Controller
      }
 
     // 3️⃣ Update DB
-    $updated = DB::table('TB_Products')->where('id', $id)->update([
+    $updated = DB::table('tb_productnew')->where('id', $id)->update([
         'product_namekhmer'     => $request->product_namekhmer,
         'product_nameenglish'   => $request->product_nameenglish,
         'price'                 => $request->price,
@@ -156,7 +156,7 @@ class ProductController extends Controller
     if ($updated) {
         return response()->json([
             'message' => 'Product updated successfully',
-            'data' => DB::table('TB_Products')->where('id', $id)->first()
+            'data' => DB::table('tb_productnew')->where('id', $id)->first()
         ], 200);
     }
 
@@ -168,7 +168,7 @@ class ProductController extends Controller
 
     public function destroy($id)
     {
-        $product = DB::table('TB_Products')->where('id', $id)->first();
+        $product = DB::table('tb_productnew')->where('id', $id)->first();
 
     if (!$product) {
         return response()->json([
@@ -191,7 +191,7 @@ class ProductController extends Controller
     }
 
     // 🔥 បន្ទាប់មកលុប data ក្នុង DB
-    DB::table('TB_Products')->where('id', $id)->delete();
+    DB::table('tb_productnew')->where('id', $id)->delete();
 
     return response()->json([
         'message' => 'Product & image deleted successfully'
