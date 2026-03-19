@@ -1,31 +1,32 @@
-# Dockerfile
-FROM php:8.1-fpm
+FROM php:8.2-fpm
 
-# Install system dependencies
+# Install system + nginx + pgsql
 RUN apt-get update && apt-get install -y \
-    git unzip zip libpq-dev libonig-dev libpng-dev libjpeg-dev libfreetype6-dev libxml2-dev \
-    build-essential pkg-config curl \
-    && rm -rf /var/lib/apt/lists/*
-
-# Configure GD for images
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg
-
-# Install PHP extensions
-RUN docker-php-ext-install pdo pdo_pgsql mbstring bcmath tokenizer xml curl gd
+    nginx \
+    git unzip curl libpq-dev \
+    && docker-php-ext-install pdo pdo_pgsql
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory
-WORKDIR /var/www/html
+# Set working dir
+WORKDIR /var/www
 
-# Copy project files
+# Copy project
 COPY . .
 
 # Install Laravel dependencies
-RUN php -d memory_limit=-1 /usr/bin/composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader
+
+# Copy nginx config
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Set permissions
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 755 /var/www/storage
 
 # Expose port
-EXPOSE 9000
+EXPOSE 10000
 
-CMD ["php-fpm"]
+# Start both services
+CMD ["sh", "-c", "php-fpm -D && nginx -g 'daemon off;'"]

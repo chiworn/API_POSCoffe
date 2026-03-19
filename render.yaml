@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: my-laravel-app
+    name: db_posprojecthosting
     env: docker
     dockerfilePath: ./Dockerfile
     envVars:
@@ -10,7 +10,7 @@ services:
         generateValue: true
 
 databases:
-  - name: my-laravel-db
-    databaseName: my_database
+  - name: db_posprojecthosting
+    databaseName: db_posprojecthosting
     user: db_user
     plan: free
