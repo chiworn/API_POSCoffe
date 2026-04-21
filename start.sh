@@ -11,7 +11,7 @@ php artisan view:cache
 php artisan migrate --force
 
 # Seed admin user (first time only)
-php artisan db:seed --class=DatabaseSeeder --force
+# php artisan db:seed --class=DatabaseSeeder --force
 
 # Fix permissions
 chmod -R 775 /var/www/storage /var/www/bootstrap/cache
