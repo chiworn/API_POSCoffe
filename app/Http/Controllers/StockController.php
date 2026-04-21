@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StockRequest;
+use App\Models\Stock;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class StockController extends Controller
 {
@@ -12,76 +13,62 @@ class StockController extends Controller
      */
     public function index()
     {
-        
+        $stocks = Stock::with('glass')->get();
+        return response()->json([
+            'Message' => "get Stock sucess",
+            "data"    => $stocks
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StockRequest $request)
     {
+        $stock = Stock::create($request->validated());
 
-        $request->validate([
-            'product_ID' => 'required|integer|exists:TB_Products,id',
-            'Glass_id'   =>  'required|integer',
-            'quantity'   => 'required|integer|min:1'
-        ]);
-
-        // Get glass product
-        $product = DB::table('TB_Products')
-                // ->where('id', $request->product_ID)
-                ->where('stock', $request->Glass_id)
-                ->first();
-
-        if (!$product) {
-             return response()->json(['error' => 'Glass product not found'], 404);
-        }
-
-        $stock = DB::table('TB_stocks')
-            ->where('Glass_id', $product->stock)
-            ->first();
-            
-
-        if (!$stock) {
-            return response()->json(['error' => 'No stock to subtract'], 400);
-        }
-
-        // Subtract quantity safely
-        $newQuantity = $stock->quantity - $request->quantity;
-
-        if ($newQuantity < 0) {
-            return response()->json(['error' => 'Not enough stock'], 400);
-        }
-
-         DB::table('TB_stocks')->updateOrInsert(
-            ['product_ID' => $product->id],
-            // ['Glass_id' => $product->stock],
-            ['quantity' => $newQuantity]
-        );
-        return response()->json(['message' => 'Stock input success']);
+        return response()->json(['message' => 'Stock added', 'id' => $stock->id], 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
-        //
+        $stock = Stock::with('glass')->find($id);
+        if (!$stock) {
+            return response()->json(['error' => 'Stock not found'], 404);
+        }
+        return response()->json($stock);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(StockRequest $request, $id)
     {
-        //
+        $stock = Stock::find($id);
+        if (!$stock) {
+            return response()->json(['error' => 'Stock not found'], 404);
+        }
+
+        $stock->update($request->validated());
+
+        return response()->json(['message' => 'Stock updated']);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        //
+        $stock = Stock::find($id);
+        if (!$stock) {
+            return response()->json(['error' => 'Stock not found'], 404);
+        }
+
+        $stock->delete();
+
+        return response()->json(['message' => 'Stock deleted']);
     }
 }

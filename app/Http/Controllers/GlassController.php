@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\GlassRequest;
+use App\Models\Glass;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class GlassController extends Controller
 {
@@ -12,57 +13,46 @@ class GlassController extends Controller
      */
     public function index()
     {
-        $glasses = DB::table('tb_glass')->get();
-        return response()->json([
-            'Message' => 'Get Glass sucess',
-            'data'    =>  $glasses]);
+        $glasses = Glass::all();
+        return response()->json($glasses);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(GlassRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string',
-            'type' => 'required|string',
-        ]);
-        
-        $id = DB::table('tb_glass')->insertGetId([
-            'name' => $request->name,
-            'type' => $request->type,
-        ]);
+        $glass = Glass::create($request->validated());
 
-        return response()->json(['message' => 'Glass created', 'id' => $id]);
+        return response()->json([
+            'message' => 'Glass created',
+            'id'      => $glass->id
+        ], 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
-        
+        $glass = Glass::find($id);
+        if (!$glass) {
+            return response()->json(['message' => 'Glass not found'], 404);
+        }
+        return response()->json($glass);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(GlassRequest $request, $id)
     {
-        
-        $request->validate([
-            'name' => 'sometimes|required|string',
-            'type' => 'sometimes|required|string',
-        ]);
-
-        $updated = DB::table('tb_glass')->where('id', $id)->update([
-            'name' => $request->name,
-            'type' => $request->type,
-        ]);
-
-        if (!$updated) {
-            return response()->json(['error' => 'Glass not found or no change'], 404);
+        $glass = Glass::find($id);
+        if (!$glass) {
+            return response()->json(['message' => 'Glass not found'], 404);
         }
+
+        $glass->update($request->validated());
 
         return response()->json(['message' => 'Glass updated']);
     }
@@ -70,13 +60,15 @@ class GlassController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        $deleted = DB::table('tb_glass')->where('id', $id)->delete();
-        if (!$deleted) {
-            return response()->json(['error' => 'Glass not found'], 404);
+        $glass = Glass::find($id);
+        if (!$glass) {
+            return response()->json(['message' => 'Glass not found'], 404);
         }
-        return response()->json(['message' => 'Glass deleted']);
 
+        $glass->delete();
+
+        return response()->json(['message' => 'Glass deleted']);
     }
 }
